@@ -16,6 +16,7 @@ class Database():
             filepath (str): the filepath to the dataset.
         """
         self.movies = self.load_movie_data(filepath)
+        self.movies = self.clean_data(self.movies)
 
     def load_movie_data(self, filepath):
         """Create a Pandas DataFrame using the CSV file containing Netflix shows and movies.
@@ -114,6 +115,30 @@ class Movie():
             IMDB Score: {self.imdb_score}
             """
 
+class User():
+    """Stores information regarding each users' preferences.
+    
+    Attributes:
+        name (str): the user's name.
+        preferences (list): a list of Movie objects pertaining to a user's favorite shows/movies.
+    """
+    def __init__(self, name):
+        """Initializes a User object
+
+        Args:
+            name (str): see class documentation
+        """
+        self.name = name
+        self.preferences = []
+    
+    def add_preference(self, movie, database):
+        if movie.lower() not in [m.title.lower() for m in self.preferences]:
+            match = [m for m in database if m.title.lower() == movie.lower()]
+            if not match:
+                raise ValueError(f"{movie} does not exist within the database.")
+            else:
+                self.preferences.append(match)
+
 class Recommender():
     """The main recommendation engine of the system
     
@@ -140,11 +165,32 @@ class Recommender():
         pass
 
 def main(filepath):
-    """Enable the recommended
+    """Starts the recommender system
 
     Args: 
         filepath (str): the path to the csv file
     """
+    database = Database(filepath)
+    user_list = []
+    while True:
+        name = input("Give me the name of a user: ")
+        user = User(name)
+        user_list.append(user)
+        while True:
+            while True:
+                try:
+                    movie = input("Enter a movie name to add it to this user's preference list: ")
+                    user.add_preference(movie, database)
+                    break
+                except ValueError as e:
+                    print(e)
+            add_movie = input("Would you like to add another movie? Type \"yes\" or \"no\": ")
+            if add_movie == 'no':
+                break
+        
+        add_user = input("Would you like to add another user? Type \"yes\" or \"no\": ")
+        if add_user == 'no':
+            break
 
 def parse_args(arglist):
     """Takes a list of strings from the command prompt and passes them through as arguments
