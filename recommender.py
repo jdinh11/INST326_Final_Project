@@ -31,7 +31,7 @@ class Database():
         #identify the columns to include in the dataframe
         cols = ["id", "title", "type", "description", "age_certification", "genres", "imdb_score"]
         #load move data from the CSV using Pandas
-        movie_df = pd.read_csv(filepath, index_col = "id", usecols=cols)
+        movie_df = pd.read_csv(filepath, usecols=cols)
         
         return movie_df
 
@@ -56,27 +56,7 @@ class Database():
         df = df[~non_english]
         
         return df
-
-    def load_movies(self):
-        """Create a list of Movie objects from the movie DataFrame.
-
-        Return:
-            movie_list (list): the list of Movie objects.
-        """
-        movie_list = []
-        for index, row in self.movies.iterrows():
-            movie_id = index
-            title = row['title']
-            media_type = row['type']
-            movie_desc = row['description']
-            genre = row['genres']
-            age_rating = row['age_certification']
-            imdb_score = row['imdb_score']
-            movie = Movie(movie_id, title, media_type, movie_desc, genre, age_rating, imdb_score)
-            movie_list.append(movie)
-        
-        return movie_list
-
+    
 class Movie():
     """A class for storing information regarding a list of Netflix medias.
 
@@ -141,42 +121,60 @@ class User():
     
     def add_preference(self, movie, database):
         if movie.lower() not in [m.title.lower() for m in self.preferences]:
-            match = [m for m in database if m.title.lower() == movie.lower()]
-            if not match:
-                raise ValueError(f"{movie} does not exist within the database.")
+            match = database.movies[database.movies['title'].str.contains(movie, case = False)]
+            if match.any():
+                index = match.idxmax()
+                result = database.movies.loc[index]
+
+                movie_id = result[0]
+                title = result[1]
+                media_type = result[2]
+                desc = result[3]
+                age_restriction = result[4]
+                genre = result[5]
+                imdb_score = result[6]
+                
+                media = Movie(movie_id, title, media_type, desc, age_restriction, genre, imdb_score)
+                self.preferences.append(media)
+            
             else:
-                self.preferences.append(match)
+                raise ValueError(f"Media with name \"{movie}\" does not exist within the database.")
 
 class Recommender():
     """The main recommendation engine of the system
     
     """
-    def __init__():
+    def __init__(self):
         pass
 
-    def get_similar_movies(self, title):
-        """Get recommendations based on friend's favorite movies
+    def get_common_genres(self, user, friend):
+        """Searches and ranks the shared genre between two users.
 
         Args: 
-            title (str): the name of a movie
+            user (User): the User object containing info about the user and their preferences.
+            friend (User): the User object containing info about the user's friend and their preferences.
+
+        Return:
+            dict: a dictionary where the key is the shared genre between two users and the amount of matches found for each shared genres.
         """
         pass
 
-    def format_results(self, recommendations):
-        """Format the recommendation list for the user
+    def get_recommendation(self, shared_genres):
+        """Get movies/shows recommendation based on the common genres of the user and their friend.
+
         Args:
-            recommedations (list): the list recommended movies
+            shared_genres (list): a dictionary of common genres between the user and their friend.
         
         Return:
-            the recommendation displayed in the formatted structure
+            tuple: the recommendation list.
         """
         pass
 
 def main(filepath):
-    """Starts the recommender system
+    """Starts the recommender system.
 
     Args: 
-        filepath (str): the path to the csv file
+        filepath (str): the path to the csv file.
     """
     database = Database(filepath)
     user_list = []
