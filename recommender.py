@@ -1,4 +1,5 @@
 import sys
+import re
 import pandas as pd
 from argparse import ArgumentParser
 
@@ -44,8 +45,16 @@ class Database():
             the polished rows of data.
         """
         #remove movies without a genres from the movie DataFrame
-        df = df[df['genres'] != '[]']
+        df = df[(df['genres'] != '[]') | df['title'].notnull()]
+        
+        # Keep only the first occurrence of each duplicated value
+        df.drop_duplicates(subset=['title'], keep='first', inplace=True)
 
+        # Remove movie or show names that contain character that are not ASCII
+        pattern = r'[^\x00-\x7F]+'
+        non_english = df['title'].str.contains(pattern)
+        df = df[~non_english]
+        
         return df
 
     def load_movies(self):
@@ -67,7 +76,6 @@ class Database():
             movie_list.append(movie)
         
         return movie_list
-
 
 class Movie():
     """A class for storing information regarding a list of Netflix medias.
