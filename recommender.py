@@ -146,10 +146,14 @@ class Recommender():
     Attributes:
         common_genres (dict): A dictionary containing the common favorite genres between the user and their friend1
     """
-    def __init__(self):
+    def __init__(self, user, friend):
         """Initializes a Recommender class
+        
+        Args: 
+            user (User): the User object containing info about the user and their preferences.
+            friend (User): the User object containing info about the user's friend and their preferences.
         """
-        self.common_genres = self.get_common_genres()
+        self.common_genres = self.get_common_genres(user, friend)
 
     def get_common_genres(self, user, friend):
         """Searches and ranks the shared genre between two users.
@@ -163,7 +167,7 @@ class Recommender():
         """
         pass
 
-    def get_recommendation(self, shared_genres):
+    def get_recommendation(self):
         """Get movies/shows recommendation based on the common genres of the user and their friend.
 
         Args:
