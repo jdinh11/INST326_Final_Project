@@ -143,9 +143,13 @@ class User():
 class Recommender():
     """The main recommendation engine of the system
     
+    Attributes:
+        common_genres (dict): A dictionary containing the common favorite genres between the user and their friend1
     """
     def __init__(self):
-        pass
+        """Initializes a Recommender class
+        """
+        self.common_genres = self.get_common_genres()
 
     def get_common_genres(self, user, friend):
         """Searches and ranks the shared genre between two users.
