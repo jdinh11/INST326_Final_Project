@@ -147,13 +147,19 @@ class Recommender():
         common_genres (dict): A dictionary containing the common favorite genres between the user and their friend1
     """
     def __init__(self, user, friend):
-        """Initializes a Recommender class
+        """Initializes a Recommender class. Sort the dictionary of common genre between two people.
         
         Args: 
             user (User): the User object containing info about the user and their preferences.
             friend (User): the User object containing info about the user's friend and their preferences.
         """
-        self.common_genres = self.get_common_genres(user, friend)
+        common_genres = self.get_common_genres(user, friend)
+        sorted_common_genres = {}
+
+        for key, value in sorted(common_genres.items(), key = lambda x: x[1]):
+            sorted_common_genres[key] = value
+
+        self.common_genres = sorted_common_genres
 
     def get_common_genres(self, user, friend):
         """Searches and ranks the shared genre between two users.
@@ -165,18 +171,42 @@ class Recommender():
         Return:
             dict: a dictionary where the key is the shared genre between two users and the amount of matches found for each shared genres.
         """
-        pass
+        user_genres = {}
+        friend_genres = {}
 
-    def get_recommendation(self):
+        for u in user.preferences:
+            for genre in u.genre:
+                if genre not in user_genres.keys():
+                    user_genres[genre] += 1
+                else:
+                    user_genres[genre] = 1
+        
+        for f in friend.preferences:
+            for genre in f.genre:
+                if genre not in friend_genres.keys():
+                    friend_genres[genre] += 1
+                else:
+                    friend_genres[genre] = 1
+        
+        shared_genres = user_genres.keys() & friend_genres.keys()
+        common_genres = {genre: user_genres[genre] + friend_genres[genre] for genre in shared_genres}
+
+        
+        return common_genres
+
+    def get_recommendation(self, database):
         """Get movies/shows recommendation based on the common genres of the user and their friend.
 
         Args:
             shared_genres (list): a dictionary of common genres between the user and their friend.
         
         Return:
-            tuple: the recommendation list.
+            DataFrame: the recommended movies/shows.
         """
-        pass
+        search_genres = self.common_genres.keys()
+        database.movies['num_matches'] = database.movies['genres'].apply(lambda x: x.isin(search_genres).sum())
+        df = database.movies.sort_value(by = 'num_matches', ascending = False)
+        
 
 def main(filepath):
     """Starts the recommender system.
