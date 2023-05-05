@@ -16,8 +16,9 @@ class Database():
         Args: 
             filepath (str): the filepath to the dataset.
         """
-        self.movies = self.load_movie_data(filepath)
-        self.movies = self.clean_data(self.movies)
+        movies = self.load_movie_data(filepath)
+        movies = self.clean_data(self.movies)
+        self.movies = movies
 
     def load_movie_data(self, filepath):
         """Create a Pandas DataFrame using the CSV file containing Netflix shows and movies.
@@ -156,7 +157,7 @@ class Recommender():
         common_genres = self.get_common_genres(user, friend)
         sorted_common_genres = {}
 
-        for key, value in sorted(common_genres.items(), key = lambda x: x[1]):
+        for key, value in sorted(common_genres.items(), key = lambda x: x[1]): 
             sorted_common_genres[key] = value
 
         self.common_genres = sorted_common_genres
@@ -176,7 +177,7 @@ class Recommender():
 
         for u in user.preferences:
             for genre in u.genre:
-                if genre not in user_genres.keys():
+                if genre in user_genres.keys():
                     user_genres[genre] += 1
                 else:
                     user_genres[genre] = 1
@@ -204,6 +205,7 @@ class Recommender():
             DataFrame: the recommended movies/shows.
         """
         search_genres = self.common_genres.keys()
+        
         database.movies['num_matches'] = database.movies['genres'].apply(lambda x: x.isin(search_genres).sum())
         df = database.movies.sort_value(by = 'num_matches', ascending = False)
         
@@ -225,9 +227,9 @@ def main(filepath):
                 try:
                     movie = input("Enter a movie name to add it to this user's preference list: ")
                     user.add_preference(movie, database)
-                    break
                 except ValueError as e:
                     print(e)
+                break
             add_movie = input("Would you like to add another movie? Type \"yes\" or \"no\": ")
             if add_movie == 'no':
                 break
