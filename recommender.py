@@ -209,6 +209,17 @@ class Recommender():
         database.movies['num_matches'] = database.movies['genres'].apply(lambda x: x.isin(search_genres).sum())
         df = database.movies.sort_value(by = 'num_matches', ascending = False)
         
+    def sort_by_score(self, df):
+        """Sort the recommendations narrowed down by genre by IMDb scores (descending order).
+        
+        Args:
+            df (dataframe): a dataframe containing a sorted list of recommendations baseed on shared genres
+            
+        Return:
+            score_df (dataframe): recommendations sorted by IMDb scores. 
+        """
+        score_df = df.sort_value(by = 'imdb_score', ascending = False)
+        return score_df
 
 def main(filepath):
     """Starts the recommender system.
