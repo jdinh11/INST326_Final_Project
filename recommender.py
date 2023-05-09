@@ -8,7 +8,7 @@ class Database():
     """A class for storing a dataframe of the dataset.
 
     Attributes:
-        movies (DataFrame): the Neflix data.
+        movies (DataFrame): dataframe containing the Neflix data.
     """
     def __init__(self, filepath):
         """Initializes a Database class.
@@ -37,7 +37,7 @@ class Database():
         return movie_df
 
     def clean_data(self, df):
-        """Process the data and get rid/modify potential insuffiencient rows within the dataframe.
+        """Process the data and get rid of/modify potential insuffiencient rows within the dataframe.
 
         Args:
             datas (tuple): rows of data for processing.
@@ -145,14 +145,14 @@ class Recommender():
     """The main recommendation engine of the system
     
     Attributes:
-        common_genres (dict): A dictionary containing the common favorite genres between the user and their friend1
+        common_genres (dict): A dictionary containing the common favorite genres between the user and one of their friends
     """
     def __init__(self, user, friend):
         """Initializes a Recommender class. Sort the dictionary of common genre between two people.
         
         Args: 
             user (User): the User object containing info about the user and their preferences.
-            friend (User): the User object containing info about the user's friend and their preferences.
+            friend (User): the User object containing info about the user's chosen friend and their preferences.
         """
         common_genres = self.get_common_genres(user, friend)
         sorted_common_genres = {}
@@ -163,11 +163,11 @@ class Recommender():
         self.common_genres = sorted_common_genres
 
     def get_common_genres(self, user, friend):
-        """Searches and ranks the shared genre between two users.
+        """Searches and ranks the shared genre between two users based on number of match occurances.
 
         Args: 
             user (User): the User object containing info about the user and their preferences.
-            friend (User): the User object containing info about the user's friend and their preferences.
+            friend (User): the User object containing info about the user's chosen friend and their preferences.
 
         Return:
             dict: a dictionary where the key is the shared genre between two users and the amount of matches found for each shared genres.
