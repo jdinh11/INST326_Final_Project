@@ -224,7 +224,7 @@ class Recommender():
         """Sort the recommendations narrowed down by genre by IMDb scores (descending order).
         
         Args:
-            df (dataframe): a dataframe containing a sorted list of recommendations baseed on shared genres
+            df (dataframe): a dataframe containing a sorted list of recommendations based on shared genres
             
         Return:
             score_df (dataframe): recommendations sorted by IMDb scores. 
