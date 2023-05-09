@@ -16,9 +16,9 @@ class Database():
         Args: 
             filepath (str): the filepath to the dataset.
         """
-        movies = self.load_movie_data(filepath)
-        movies = self.clean_data(self.movies)
-        self.movies = movies
+        self.movies = self.load_movie_data(filepath)
+        self.movies = self.clean_data(self.movies)
+        
 
     def load_movie_data(self, filepath):
         """Create a Pandas DataFrame using the CSV file containing Netflix shows and movies.
@@ -123,9 +123,11 @@ class User():
     def add_preference(self, movie, database):
         if movie.lower() not in [m.title.lower() for m in self.preferences]:
             match = database.movies[database.movies['title'].str.contains(movie, case = False)]
-            if match.any():
-                index = match.idxmax()
-                result = database.movies.loc[index]
+            print(match['genres'])
+            if not match.empty:
+                match['imdb_score'] = pd.to_numeric(match['imdb_score'], errors='coerce')
+                index = match['imdb_score'].idxmax()
+                result = database.movies.loc[index].copy()
 
                 movie_id = result[0]
                 title = result[1]
@@ -154,15 +156,16 @@ class Recommender():
             user (User): the User object containing info about the user and their preferences.
             friend (User): the User object containing info about the user's chosen friend and their preferences.
         """
-        common_genres = self.get_common_genres(user, friend)
-        sorted_common_genres = {}
+        self.common_genres = {}
+        self.user = user
+        self.friend = friend        
+
+        common_genres = self.get_common_genres()
 
         for key, value in sorted(common_genres.items(), key = lambda x: x[1]): 
-            sorted_common_genres[key] = value
+            self.common_genres[key] = value
 
-        self.common_genres = sorted_common_genres
-
-    def get_common_genres(self, user, friend):
+    def get_common_genres(self):
         """Searches and ranks the shared genre between two users based on number of match occurances.
 
         Args: 
@@ -175,16 +178,19 @@ class Recommender():
         user_genres = {}
         friend_genres = {}
 
-        for u in user.preferences:
+        print(self.user.preferences, self.friend.preferences)
+
+        for u in self.user.preferences:
             for genre in u.genre:
                 if genre in user_genres.keys():
                     user_genres[genre] += 1
                 else:
                     user_genres[genre] = 1
         
-        for f in friend.preferences:
+        for f in self.friend.preferences:
+            print(f.genre)
             for genre in f.genre:
-                if genre not in friend_genres.keys():
+                if genre in friend_genres.keys():
                     friend_genres[genre] += 1
                 else:
                     friend_genres[genre] = 1
@@ -199,16 +205,21 @@ class Recommender():
         """Get movies/shows recommendation based on the common genres of the user and their friend.
 
         Args:
-            shared_genres (list): a dictionary of common genres between the user and their friend.
+            database (Database): a representation of the Database class.
         
         Return:
             DataFrame: the recommended movies/shows.
         """
-        search_genres = self.common_genres.keys()
-        
-        database.movies['num_matches'] = database.movies['genres'].apply(lambda x: x.isin(search_genres).sum())
+        search_genres = list(self.common_genres.keys())
+        df = database.movies[database.movies['genres'].apply(lambda x: search_genres[0] in x)]
+        search_genres.pop(0)
+
+        df['num_matches'] = df['genres'].apply(lambda x: x.isin(search_genres).sum())
         df = database.movies.sort_value(by = 'num_matches', ascending = False)
         
+        return df
+       
+
     def sort_by_score(self, df):
         """Sort the recommendations narrowed down by genre by IMDb scores (descending order).
         
@@ -242,12 +253,38 @@ def main(filepath):
                     print(e)
                 break
             add_movie = input("Would you like to add another movie? Type \"yes\" or \"no\": ")
-            if add_movie == 'no':
+            if add_movie == 'yes':
+                continue
+            elif add_movie == 'no':
                 break
+            #else:
+                #raise ValueError(f"{add_movie} is not a valid response.")
         
         add_user = input("Would you like to add another user? Type \"yes\" or \"no\": ")
         if add_user == 'no':
             break
+
+    match = False
+    while not match:
+        first_user = input("Please enter the name of the first user to compare: ")
+        for i in user_list:
+            if first_user == i.name:
+                first_user = i
+                match = True
+        
+    match = False
+    while not match:
+        second_user = input("Please enter the name of the second user to compare: ")
+        for i in user_list:
+            if second_user == i.name:
+                second_user = i
+                match = True
+        
+    recommender = Recommender(first_user, second_user)
+    recommended_movies = recommender.get_recommendation(database)
+
+    num = int(input("Select the number of results to display: "))
+    print(recommended_movies.head(num))
 
 def parse_args(arglist):
     """Takes a list of strings from the command prompt and passes them through as arguments
