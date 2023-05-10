@@ -45,6 +45,9 @@ class Database():
         Return:
             the polished rows of data.
         """
+        #fill in NaN values within imdb_score column with 0
+        df['imdb_score'].fillna(0, inplace = True)
+        
         #remove movies without a genres from the movie DataFrame
         df = df[(df['genres'] != '[]') | df['title'].notnull()]
         
@@ -122,22 +125,12 @@ class User():
     
     def add_preference(self, movie, database):
         if movie.lower() not in [m.title.lower() for m in self.preferences]:
-            match = database.movies[database.movies['title'].str.contains(movie, case = False)]
-            print(match['genres'])
+            match = database.movies.loc[database.movies['title'].str.contains(movie, case = False)]
+            print(match['title'].values, match['imdb_score'])
             if not match.empty:
-                match['imdb_score'] = pd.to_numeric(match['imdb_score'], errors='coerce')
-                index = match['imdb_score'].idxmax()
-                result = database.movies.loc[index].copy()
-
-                movie_id = result[0]
-                title = result[1]
-                media_type = result[2]
-                desc = result[3]
-                age_restriction = result[4]
-                genre = result[5]
-                imdb_score = result[6]
-                
-                media = Movie(movie_id, title, media_type, desc, age_restriction, genre, imdb_score)
+  
+                media = Movie(match['id'].iloc[0], match['title'].iloc[0], match['type'].iloc[0], match['description'].iloc[0], match['genres'].iloc[0], match['age_certification'].iloc[0], match['imdb_score'].iloc[0])
+                print(media.movie_id,'\n', media.title, media.movie_desc, media.age_rating, media.genre, media.imdb_score)
                 self.preferences.append(media)
             
             else:
@@ -181,6 +174,7 @@ class Recommender():
         print(self.user.preferences, self.friend.preferences)
 
         for u in self.user.preferences:
+            print(u.genre)
             for genre in u.genre:
                 if genre in user_genres.keys():
                     user_genres[genre] += 1
@@ -210,14 +204,25 @@ class Recommender():
         Return:
             DataFrame: the recommended movies/shows.
         """
+        df_copy = database.movies.copy()
         search_genres = list(self.common_genres.keys())
-        df = database.movies[database.movies['genres'].apply(lambda x: search_genres[0] in x)]
-        search_genres.pop(0)
-
-        df['num_matches'] = df['genres'].apply(lambda x: x.isin(search_genres).sum())
-        df = database.movies.sort_value(by = 'num_matches', ascending = False)
         
-        return df
+        df_copy = df_copy[df_copy['genres'].apply(lambda x: search_genres[0] in x)]
+        search_genres.pop(0)
+        
+        #df_copy['genres'] = df_copy['genres'].apply(lambda x: x.strip('][').split(', ') if isinstance(x, str) else x)
+        #df_copy['num_matches'] = df_copy['genres'].apply(lambda x: pd.Series(x).isin(search_genres).sum())
+        df_copy['num_matches'] = 0
+        for i, row in df_copy.iterrows():
+            # Split the genres string into a list
+            genres_list = row['genres'].strip('][').split(', ')
+            # Count the number of matches with the search genres
+            num_matches = sum([genre in search_genres for genre in genres_list])
+            # Update the 'num_matches' column for the current row
+            df_copy.loc[i, 'num_matches'] = num_matches        
+        print(df_copy.head(10))
+        print(df_copy.tail(10))
+        return df_copy
        
 
     def sort_by_score(self, df):
