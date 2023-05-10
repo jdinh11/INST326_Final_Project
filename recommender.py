@@ -87,10 +87,13 @@ class Movie():
         self.title = title
         self.media_type = media_type
         self.movie_desc = movie_desc
-        self.genre = genre
+        self.genre = []
         self.age_rating = age_rating
         self.imdb_score = imdb_score
 
+        genre_list = genre[1:-1]
+        genre_list = [genre.strip() for genre in genre_list.split(',')]
+        self.genre = [genre.strip("'") for genre in genre_list]
     def __str__(self):
         """Returns a string representation of the Movie object.
 
@@ -191,7 +194,7 @@ class Recommender():
         
         shared_genres = user_genres.keys() & friend_genres.keys()
         common_genres = {genre: user_genres[genre] + friend_genres[genre] for genre in shared_genres}
-
+        print(shared_genres, common_genres)
         
         return common_genres
 
@@ -206,8 +209,8 @@ class Recommender():
         """
         df_copy = database.movies.copy()
         search_genres = list(self.common_genres.keys())
-        
-        df_copy = df_copy[df_copy['genres'].apply(lambda x: search_genres[0] in x)]
+        print(search_genres)
+        df_copy = df_copy[df_copy['genres'].apply(lambda x: any(genre in x for genre in search_genres))]
         search_genres.pop(0)
         
         #df_copy['genres'] = df_copy['genres'].apply(lambda x: x.strip('][').split(', ') if isinstance(x, str) else x)
@@ -216,12 +219,14 @@ class Recommender():
         for i, row in df_copy.iterrows():
             # Split the genres string into a list
             genres_list = row['genres'].strip('][').split(', ')
+            genres_list = [genre.strip("'") for genre in genres_list]
             # Count the number of matches with the search genres
+            #print([genre in search_genres for genre in genres_list])
             num_matches = sum([genre in search_genres for genre in genres_list])
             # Update the 'num_matches' column for the current row
             df_copy.loc[i, 'num_matches'] = num_matches        
-        print(df_copy.head(10))
-        print(df_copy.tail(10))
+        #print(df_copy.head(10))
+        #print(df_copy.tail(10))
         return df_copy
        
 
