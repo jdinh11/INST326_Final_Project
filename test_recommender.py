@@ -25,24 +25,30 @@ def test_load_movie_data():
 def test_clean_data():
     movie_df = pd.DataFrame({
         'id': [1, 2, 3, 4, 5],
-        'title': ['title1', 'title2', 'title3', 'title1', 'PokÃ©mon'], #should remove the column with 'PokÃ©mon'(id:4) and duplicate 'title1'(id:5)
+        'title': ['title1', 'title2', 'title3', 'title1', 'PokÃ©mon'], #should remove the duplicate 'title1'(id:5)
         'type': ['MOVIE1', 'MOVIE2', 'MOVIE3', 'MOVIE4', 'MOVIE5'], 
         'description': ['desc1', 'desc2', 'desc3', 'desc4', 'desc5'],
         'age_certification': ['age1', 'age2', 'age3', 'age4', 'age5'],
         'genres': ["['genre1', 'genre2']", "['genre1']" , None, "['genre1']", "['genre1']"], #should remove the column with empty genre (id:3)
-        'imdb_score': [8.9, None, 7.9, 9.0, 8.7] #should remove the column with an empty imdb_score (id:2)
+        'imdb_score': [8.9, None, 7.9, 9.0, 8.7] #should replace any None value with a 0 in the imdb_score column (id:2)
     })
     
+    #creates instance of Database using the filepath
     df = Database(filepath='titles.csv')
+    
     #checks if the clean_data method works on the instance of Database
     movie_df_cleaned = df.clean_data(movie_df)
+    
     #checks if all null values in 'imdb_score' column are replaced with 0 from the dataframe
     assert movie_df_cleaned['imdb_score'].isnull().sum() == 0
-    #checks if movies without a genre or titles are removed. Should be 3.
+    
+    #checks if movies without a genre are removed. Should be 3.
     assert len(movie_df_cleaned) == 3
+    
     #checks if duplicated movie titles are removed
     assert len(movie_df_cleaned['title']) == len(movie_df_cleaned['title'].unique())
-    #checks that movie names that contain ASCII chracters are removed 
+    
+    #checks that movie names that are not ASCII chracters are removed 
     assert not movie_df_cleaned['title'].str.contains(r'[^\x00-\x7F]+').any()
     
 def test_Movie():
