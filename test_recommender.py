@@ -40,8 +40,8 @@ def test_clean_data():
     movie_df_cleaned = df.clean_data(movie_df)
     #checks if all null values in 'imdb_score' column are replaced with 0 from the dataframe
     assert movie_df_cleaned['imdb_score'].isnull().sum() == 0
-    #checks if movies without a genre are removed. Should be 2.
-    assert len(movie_df_cleaned['genres']) == 2
+    #checks if movies without a genre are removed. Should be 2 while factoring the removed movies from id: 3,4,5.
+    assert len(movie_df_cleaned.dropna(subset=['genres'])) == 2
     #checks if duplicated movie titles are removed
     assert len(movie_df_cleaned['title']) == len(movie_df_cleaned['title'].unique())
     #checks that movie names that are not ASCII chracters are removed 
