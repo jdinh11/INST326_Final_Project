@@ -1,8 +1,10 @@
 # Movie Recommendation System
-Our project is a Movie Recommendation System that will recommend users movies to watch based on their friend's interest
-by ranking the favorite genres of all movies the user has provided and comparing it with their freinds to display movies
-that they all could be potentially interested in
+Our project is a Movie Recommendation System that will help users find reccommendations based on their movie preferences and their friend's as well. This system will allow users to add their movie preferences as well as their friends', and then allows the user to select two users to compare preferences with and return the recommended movies to watch. Addtionally, the user can enter the number of recommended movies they want returned back to them in order to avoid overwhelming them.
 
 # How to run the program in the command line
-The program will be run from the command line by the user first being prompt to enter the user's name. Then it will ask the user to enter their favorite movies, given that it is in our database of movies and will be ask to continue adding movies or stop whenever when they want too. Finally, the user can add more users if they want too which will repeat the whole process again and are given the option to stop when neccessary. 
+First, enter the name of the python file (recommender.py) and the csv file (titles.csv). Next, it will ask to enter the user's name and then their favorite movie. It will then ask if you would like to add more movies. You can type "yes" and keep adding more movies until you type "no". It will then ask if you would like to add another user in which the user can type "yes" and repeat the process of adding their movies or type "no". It will then ask to pick 2 users' you would like to compare movies with. Finally, it will ask how many results you want displayed in which the user can enter an integer and it will print out a dataframe of movies containing the content recommended for the 2 users.
+
+# How to interpret the output of the program
+
+# Bibliography 
 

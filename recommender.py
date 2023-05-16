@@ -243,31 +243,45 @@ def main(filepath):
     Args: 
         filepath (str): the path to the csv file.
     """
-    database = Database(filepath)
-    user_list = []
+    database = Database(filepath) #creates database object using the filepath
+    user_list = [] #empty list to store the user objects entered
+    
     while True:
         name = input("Give me the name of a user: ")
-        user = User(name)
-        user_list.append(user)
+        user = User(name) #creates user object with the name entered
+        user_list.append(user) #appends the user object into the user_list to store each user object created
+        
         while True:
             while True:
-                try:
-                    movie = input("Enter a movie name to add it to this user's preference list: ")
-                    user.add_preference(movie, database)
-                except ValueError as e:
-                    print(e)
-                break
-            add_movie = input("Would you like to add another movie? Type \"yes\" or \"no\": ")
-            if add_movie == 'yes':
-                continue
-            elif add_movie == 'no':
-                break
-            #else:
-                #raise ValueError(f"{add_movie} is not a valid response.")
+                movie = input("Enter a movie name to add it to this user's preference list: ") #prompt to enter movie name
+                movie_match = database.movies.loc[database.movies['title'] == movie] #finds movies in the database that match the movie entered
+                if not movie_match.empty: #if there is a match
+                    try:
+                        user.add_preference(movie, database) #adds the movie to the user's preference list using the add_preference() method
+                        break
+                    except ValueError:
+                        print("Error adding the movie. Please enter another movie") #prints an error message if there was an error adding the movie
+                else:
+                    print("Movie not found in database. Please enter another movie") #prints a message if there is not match and prompts the user to try again.
+                    
+            add_movie = input("Would you like to add another movie? Type \"yes\" or \"no\": ") #asks if they want to add another movie
+            
+            if add_movie.lower() == 'yes':
+                continue #repeats the loop again
+            
+            elif add_movie.lower() == 'no':
+                break #breaks the loop
         
-        add_user = input("Would you like to add another user? Type \"yes\" or \"no\": ")
-        if add_user == 'no':
-            break
+        add_user = input("Would you like to add another user? Type \"yes\" or \"no\": ") #asks if they want to enter a user
+        if len(user_list) < 2 and add_user.lower() == "no": #checks if there are less than 2 users added and the response is "no"
+            print("A minimum of two users is required") #message stating they need at least 2 users to recommend movies with
+            continue #goes to the outer loop where they will be prompt to add a user again
+        
+        elif add_user.lower() == 'yes':
+            continue #goes to the outer loop where they will be prompt to add a user again
+        
+        elif add_user.lower() == 'no':
+            break #exits the outer loop and moves to the matches
 
     match = False
     while not match:
