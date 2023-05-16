@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from recommender import Database, Movie
+from recommender import Database, Movie, User
 
 def test_Database():
     filepath = Database("titles.csv")
@@ -42,30 +42,30 @@ def test_clean_data():
     assert movie_df_cleaned['imdb_score'].isnull().sum() == 0
     #checks if movies without a genre are removed. Should be 2 while factoring the removed movies from id: 3,4,5.
     assert len(movie_df_cleaned.dropna(subset=['genres'])) == 2
-    #checks if duplicated movie titles are removed
+    #checks that there are no duplicate movie titles
     assert len(movie_df_cleaned['title']) == len(movie_df_cleaned['title'].unique())
-    #checks that movie names that are not ASCII chracters are removed 
+    #checks that there are movie names that are not ASCII chracters 
     assert not movie_df_cleaned['title'].str.contains(r'[^\x00-\x7F]+').any()
     
 def test_Movie():
-    movie_id = "tm70993"
-    title = "Life of Brian"
+    movie_id = "tm69997"
+    title = "Richard Pryor: Live in Concert"
     media_type = "MOVIE"
-    movie_desc = "Brian Cohen is an average young Jewish man, but through a series of ridiculous events, he gains a reputation as the Messiah. When he's not dodging his followers or being scolded by his shrill mother, the hapless Brian has to contend with the pompous Pontius Pilate and acronym-obsessed members of a separatist movement. Rife with Monty Python's signature absurdity, the tale finds Brian's life paralleling Biblical lore, albeit with many more laughs."
-    genre = "['comedy','GB']"
+    movie_desc = "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
+    genre = "['comedy','documentation']"
     age_rating = "R"
-    imdb_score = 8.0
+    imdb_score = 8.1
     
     #creates movie object
     movie_obj = Movie(movie_id, title, media_type, movie_desc, genre, age_rating, imdb_score)
     #checks if the attributes of the object from the Movie class match the variables defined
-    assert movie_obj.movie_id == "tm70993"
-    assert movie_obj.title == "Life of Brian"
+    assert movie_obj.movie_id == "tm69997"
+    assert movie_obj.title == "Richard Pryor: Live in Concert"
     assert movie_obj.media_type == "MOVIE"
-    assert movie_obj.movie_desc == "Brian Cohen is an average young Jewish man, but through a series of ridiculous events, he gains a reputation as the Messiah. When he's not dodging his followers or being scolded by his shrill mother, the hapless Brian has to contend with the pompous Pontius Pilate and acronym-obsessed members of a separatist movement. Rife with Monty Python's signature absurdity, the tale finds Brian's life paralleling Biblical lore, albeit with many more laughs."
-    assert movie_obj.genre == ['comedy','GB']
+    assert movie_obj.movie_desc == "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
+    assert movie_obj.genre == ['comedy','documentation']
     assert movie_obj.age_rating == "R"
-    assert movie_obj.imdb_score == 8.0
+    assert movie_obj.imdb_score == 8.1
 
 def test_str():
     movie_id = "tm69997"
@@ -76,7 +76,7 @@ def test_str():
     age_rating = "R"
     imdb_score = 8.1
     
-    #creates movie object
+    #creates Movie object
     movie_obj = Movie(movie_id, title, media_type, movie_desc, genre, age_rating, imdb_score)
     #turns each attribute in the Movie object into a string
     str_title = str(movie_obj.title)
@@ -95,8 +95,41 @@ def test_str():
     assert str_age_rating == "R"
     assert str_imdb_score == "8.1"
 
+def test_User():
+    name = "Joe"
+    #creates User object with name "Joe"
+    user_obj = User(name)
+    #checks that all the movies in the User's preferences is an instance of the Movie class
+    assert all(isinstance(x, Movie) for x in user_obj.preferences)
     
-
-
-
-
+def test_add_preference():
+    name = "Harry"
+    #creates User object 
+    user_obj = User(name)
+    #creates Database object
+    database = Database("titles.csv")
+    
+    #calls the add_preference method to add the movie to the User's preferences
+    user_obj.add_preference("Richard Pryor: Live in Concert", database)
+    
+    #checks that the movie was succesfully added to the preferences as well as the attributes of the movie 
+    assert len(user_obj.preferences) == 1
+    assert user_obj.preferences[0].title == "Richard Pryor: Live in Concert"
+    assert user_obj.preferences[0].movie_id == "tm69997"
+    assert user_obj.preferences[0].media_type == "MOVIE"
+    assert user_obj.preferences[0].movie_desc == "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
+    assert user_obj.preferences[0].genre == ['comedy', 'documentation']
+    assert user_obj.preferences[0].age_rating == "R"
+    assert user_obj.preferences[0].imdb_score == 8.1
+    
+    #adds another movie to the user's preferences
+    user_obj.add_preference("Life of Brian", database)
+    #checks that it successfully added another movie and as well as the attributes of the movie
+    assert len(user_obj.preferences) == 2
+    assert user_obj.preferences[1].title == "Life of Brian"
+    assert user_obj.preferences[1].movie_id == "tm70993"
+    assert user_obj.preferences[1].media_type == "MOVIE"
+    assert user_obj.preferences[1].movie_desc == "Brian Cohen is an average young Jewish man, but through a series of ridiculous events, he gains a reputation as the Messiah. When he's not dodging his followers or being scolded by his shrill mother, the hapless Brian has to contend with the pompous Pontius Pilate and acronym-obsessed members of a separatist movement. Rife with Monty Python's signature absurdity, the tale finds Brian's life paralleling Biblical lore, albeit with many more laughs."
+    assert user_obj.preferences[1].genre == ['comedy']
+    assert user_obj.preferences[1].age_rating == "R"
+    assert user_obj.preferences[1].imdb_score == 8.0
