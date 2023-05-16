@@ -104,6 +104,6 @@ def test_User():
     preferences_obj = User(preferences)
     #turns the name attribute in the User object into a string
     str_name = str(user_obj.name)
-    #checks to see if the value in the attribute matches the name
+    #checks to see if the values in the attribute match the string (name) and list (preferences)
     assert str_name == 'Megan'
     assert preferences_obj == ['adventure', 'comedy', 'action']
