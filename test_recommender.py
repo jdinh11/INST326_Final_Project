@@ -97,10 +97,13 @@ def test_str():
     
 def test_User():
     name = 'Megan'
+    preferences = ['adventure', 'comedy', 'action']
     
     #creates User object
     user_obj = User(name)
+    preferences_obj = User(preferences)
     #turns the name attribute in the User object into a string
     str_name = str(user_obj.name)
     #checks to see if the value in the attribute matches the name
     assert str_name == 'Megan'
+    assert preferences_obj == ['adventure', 'comedy', 'action']
