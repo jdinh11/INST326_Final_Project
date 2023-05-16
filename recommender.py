@@ -45,21 +45,22 @@ class Database():
         Return:
             the polished rows of data.
         """
+        df_copy = df.copy()
         #fill in NaN values within imdb_score column with 0
-        df['imdb_score'].fillna(0, inplace = True)
+        df_copy['imdb_score'].fillna(0, inplace = True)
         
         #remove movies without a genres from the movie DataFrame
-        df = df[(df['genres'] != '[]') | df['title'].notnull()]
+        df_copy = df_copy[(df_copy['genres'] != '[]') | df['title'].notnull()]
         
         # Keep only the first occurrence of each duplicated value
-        df.drop_duplicates(subset=['title'], keep='first', inplace=True)
+        df_copy.drop_duplicates(subset=['title'], keep='first', inplace=True)
 
         # Remove movie or show names that contain character that are not ASCII
         pattern = r'[^\x00-\x7F]+'
-        non_english = df['title'].str.contains(pattern)
-        df = df[~non_english]
+        non_english = df_copy['title'].str.contains(pattern)
+        df_copy = df_copy[~non_english]
         
-        return df
+        return df_copy
     
     def find_movie(self, movie):
         match = self.movies.loc[self.movies['title'].str.contains(movie, case = False)]
