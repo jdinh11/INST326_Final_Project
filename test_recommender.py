@@ -108,10 +108,17 @@ def test_User():
 """
 How to test the add_preference() function within the User class:
 
-Step 1: Import a dataframe into the Database object
+Step 1: Import a .csv file into the Database object, which will contain the necessary list of medias to to populate our dataframe 
 Step 2: Get a movie name from the user
-Step 3: Pass the Database object 
-Step 4: Check if the provided movie is in the Database (find a match)
-    Step 4a: If there is a match, append the movie object to self.preference
-    Step 4b: If there is no match, return a Value Error
+Step 3: Pass in the movie name and the Database object as arguments into the add_prefenrence() method
+Step 4: add_prefrence() will check if the provided movie is in the list of prefernces (find a match)
+- If the movie is not present:
+    Step 5: Check if the movie name exists within the Database
+    - If there is a match:
+        Step 6: add_preference() will create a Movie object based on that movie's attributes.
+        Step 7: add_preference() will append that Movie object to the preference attribute of the User representation.
+    - If there is no match:
+        Step 6: the method raises a ValueError
+
+To determine if the test was successful, the tester can check if either a Movie object was appended to User.preferences or a ValueError was raised.
 """

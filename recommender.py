@@ -209,10 +209,7 @@ class Recommender():
         search_genres = list(self.common_genres.keys())
         print(search_genres)
         df_copy = df_copy[df_copy['genres'].apply(lambda x: any(genre in x for genre in search_genres))]
-        #search_genres.pop(0)
-        #print(search_genres)
-        #df_copy['genres'] = df_copy['genres'].apply(lambda x: x.strip('][').split(', ') if isinstance(x, str) else x)
-        #df_copy['num_matches'] = df_copy['genres'].apply(lambda x: pd.Series(x).isin(search_genres).sum())
+
         df_copy['num_matches'] = 0
         for i, row in df_copy.iterrows():
             # Split the genres string into a list
