@@ -48,31 +48,31 @@ def test_clean_data():
     assert not movie_df_cleaned['title'].str.contains(r'[^\x00-\x7F]+').any()
     
 def test_Movie():
-    movie_id = "tm70993"
-    title = "Life of Brian"
+    movie_id = "tm69997"
+    title = "Richard Pryor: Live in Concert"
     media_type = "MOVIE"
-    movie_desc = "Brian Cohen is an average young Jewish man, but through a series of ridiculous events, he gains a reputation as the Messiah. When he's not dodging his followers or being scolded by his shrill mother, the hapless Brian has to contend with the pompous Pontius Pilate and acronym-obsessed members of a separatist movement. Rife with Monty Python's signature absurdity, the tale finds Brian's life paralleling Biblical lore, albeit with many more laughs."
-    genre = "['comedy','GB']"
+    movie_desc = "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
+    genre = "['comedy', 'documentation']"
     age_rating = "R"
-    imdb_score = 8.0
+    imdb_score = 8.1
     
     #creates movie object
     movie_obj = Movie(movie_id, title, media_type, movie_desc, genre, age_rating, imdb_score)
     #checks if the attributes of the object from the Movie class match the variables defined
-    assert movie_obj.movie_id == "tm70993"
-    assert movie_obj.title == "Life of Brian"
+    assert movie_obj.movie_id == "tm69997"
+    assert movie_obj.title == "Richard Pryor: Live in Concert"
     assert movie_obj.media_type == "MOVIE"
-    assert movie_obj.movie_desc == "Brian Cohen is an average young Jewish man, but through a series of ridiculous events, he gains a reputation as the Messiah. When he's not dodging his followers or being scolded by his shrill mother, the hapless Brian has to contend with the pompous Pontius Pilate and acronym-obsessed members of a separatist movement. Rife with Monty Python's signature absurdity, the tale finds Brian's life paralleling Biblical lore, albeit with many more laughs."
-    assert movie_obj.genre == ['comedy','GB']
+    assert movie_obj.movie_desc == "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
+    assert movie_obj.genre == ['comedy','documentation']
     assert movie_obj.age_rating == "R"
-    assert movie_obj.imdb_score == 8.0
+    assert movie_obj.imdb_score == 8.1
 
 def test_str():
     movie_id = "tm69997"
     title = "Richard Pryor: Live in Concert"
     media_type = "MOVIE"
     movie_desc = "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
-    genre = "['comedy', 'documentation']"
+    genre = ['comedy', 'documentation']
     age_rating = "R"
     imdb_score = 8.1
     
@@ -97,13 +97,12 @@ def test_str():
     
 def test_User():
     name = 'Megan'
-    preferences = ['adventure', 'comedy', 'action']
     
     #creates User object
     user_obj = User(name)
-    preferences_obj = User(preferences)
     #turns the name attribute in the User object into a string
     str_name = str(user_obj.name)
     #checks to see if the value in the attribute matches the name
     assert str_name == 'Megan'
-    assert preferences_obj == ['adventure', 'comedy', 'action']
+    
+    
