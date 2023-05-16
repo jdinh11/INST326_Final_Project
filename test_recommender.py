@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from recommender import Database, Movie
+from recommender import Database, Movie, User
 
 def test_Database():
     filepath = Database("titles.csv")
@@ -94,9 +94,13 @@ def test_str():
     assert str_genre == "['comedy', 'documentation']"
     assert str_age_rating == "R"
     assert str_imdb_score == "8.1"
-
     
-
-
-
-
+def test_User():
+    name = 'Megan'
+    
+    #creates User object
+    user_obj = User(name)
+    #turns the name attribute in the User object into a string
+    str_name = str(user_obj.name)
+    #checks to see if the value in the attribute matches the name
+    assert str_name == 'Megan'
