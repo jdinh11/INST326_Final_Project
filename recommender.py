@@ -61,6 +61,14 @@ class Database():
         
         return df
     
+    def find_movie(self, movie):
+        match = self.movies.loc[self.movies['title'].str.contains(movie, case = False)]
+        if not match.empty:
+            media = Movie(match['id'].iloc[0], match['title'].iloc[0], match['type'].iloc[0], match['description'].iloc[0], match['genres'].iloc[0], match['age_certification'].iloc[0], match['imdb_score'].iloc[0]) 
+            return media
+        else:
+            return None
+        
 class Movie():
     """A class for storing information regarding a list of Netflix medias.
 
@@ -101,15 +109,7 @@ class Movie():
         Return:
             str: a string representation of the Movie object detailings the movie's attributes.
         """
-        return f"""\
-            Name: {self.title}
-            ID: {self.movie_id}
-            Media Type: {self.media_type}
-            Description: {self.movie_desc}
-            Genre: {self.genre}
-            Age Certification: {self.age_rating}
-            IMDB Score: {self.imdb_score}
-            """
+        return f"""Name: {self.title}\nID: {self.movie_id}\nMedia Type: {self.media_type}\nDescription: {self.movie_desc}\nGenre: {self.genre}\nAge Certification: {self.age_rating}\nIMDB Score: {self.imdb_score}"""
 
 class User():
     """Stores information regarding each users' preferences.
@@ -193,7 +193,6 @@ class Recommender():
         shared_genres = user_genres.keys() & friend_genres.keys()
         common_genres = {genre: user_genres[genre] + friend_genres[genre] for genre in shared_genres}
         print(shared_genres, common_genres)
-        
         return common_genres
 
     def get_recommendation(self, database):
@@ -209,8 +208,8 @@ class Recommender():
         search_genres = list(self.common_genres.keys())
         print(search_genres)
         df_copy = df_copy[df_copy['genres'].apply(lambda x: any(genre in x for genre in search_genres))]
-        search_genres.pop(0)
-        
+        #search_genres.pop(0)
+        #print(search_genres)
         #df_copy['genres'] = df_copy['genres'].apply(lambda x: x.strip('][').split(', ') if isinstance(x, str) else x)
         #df_copy['num_matches'] = df_copy['genres'].apply(lambda x: pd.Series(x).isin(search_genres).sum())
         df_copy['num_matches'] = 0
@@ -221,8 +220,10 @@ class Recommender():
             # Count the number of matches with the search genres
             num_matches = sum([genre in search_genres for genre in genres_list])
             # Update the 'num_matches' column for the current row
-            df_copy.loc[i, 'num_matches'] = num_matches        
-        return df_copy
+            df_copy.loc[i, 'num_matches'] = num_matches 
+
+        ranked_df = df_copy.sort_values(by = 'num_matches', ascending = False)
+        return ranked_df
        
 
     def sort_by_score(self, df):
@@ -234,7 +235,7 @@ class Recommender():
         Return:
             score_df (dataframe): recommendations sorted by IMDb scores. 
         """
-        score_df = df.sort_value(by = 'imdb_score', ascending = False)
+        score_df = df.sort_values(by = 'imdb_score', ascending = False)
         return score_df
 
 def main(filepath):
@@ -254,13 +255,10 @@ def main(filepath):
         while True:
             while True:
                 movie = input("Enter a movie name to add it to this user's preference list: ") #prompt to enter movie name
-                movie_match = database.movies.loc[database.movies['title'] == movie] #finds movies in the database that match the movie entered
+                movie_match = database.movies.loc[database.movies['title'].str.contains(re.escape(movie), flags=re.IGNORECASE)] #finds movies in the database that match the movie entered
                 if not movie_match.empty: #if there is a match
-                    try:
-                        user.add_preference(movie, database) #adds the movie to the user's preference list using the add_preference() method
-                        break
-                    except ValueError:
-                        print("Error adding the movie. Please enter another movie") #prints an error message if there was an error adding the movie
+                    user.add_preference(movie, database) #adds the movie to the user's preference list using the add_preference() method
+                    break
                 else:
                     print("Movie not found in database. Please enter another movie") #prints a message if there is not match and prompts the user to try again.
                     
@@ -304,6 +302,28 @@ def main(filepath):
 
     num = int(input("Select the number of results to display: "))
     print(recommended_movies.head(num))
+
+    sort = input("Would you like to sort the results by imdb score? Enter 'yes' or 'no': ")
+    while sort != 'yes' and sort != 'no':
+        sort = input("Please enter 'yes' or 'no': ")
+    if sort == 'yes':
+        print(recommender.sort_by_score(recommended_movies).head(num))
+
+    response = input("Would you like to see the details of a media? Type 'yes' or 'no': ")
+    while response != 'yes' and response != 'no':
+        response = input("Please enter 'yes' or 'no': ")
+
+    while response == "yes":
+        media_name = input("Please enter the name of the media: ")
+        media = database.find_movie(media_name)
+        if media is not None:
+            print(media)
+        else:
+            print("Movie not found.")
+        response = input("Would you like to see the details of another media? Type 'yes' or 'no': ")
+        while response != 'yes' and response != 'no':
+            response = input("Please enter 'yes' or 'no': ")
+
 
 def parse_args(arglist):
     """Takes a list of strings from the command prompt and passes them through as arguments
