@@ -96,13 +96,22 @@ def test_str():
     assert str_imdb_score == "8.1"
     
 def test_User():
-    name = 'Megan'
-    
+    name = 'Megan'    
     #creates User object
     user_obj = User(name)
     #turns the name attribute in the User object into a string
     str_name = str(user_obj.name)
-    #checks to see if the values in the attribute match the string (name) and list (preferences)
+    #checks to see if the value in the attribute matches
     assert str_name == 'Megan'
     
     
+"""
+How to test the add_preference() function within the User class:
+
+Step 1: Import a dataframe into the Database object
+Step 2: Get a movie name from the user
+Step 3: Pass the Database object 
+Step 4: Check if the provided movie is in the Database (find a match)
+    Step 4a: If there is a match, append the movie object to self.preference
+    Step 4b: If there is no match, return a Value Error
+"""
