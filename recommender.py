@@ -259,6 +259,8 @@ def main(filepath):
                     print("Movie not found in database. Please enter another movie") #prints a message if there is not match and prompts the user to try again.
                     
             add_movie = input("Would you like to add another movie? Type \"yes\" or \"no\": ") #asks if they want to add another movie
+            while add_movie != 'yes' and add_movie != 'no':
+                add_movie = input("Please enter 'yes' or 'no': ")
             
             if add_movie.lower() == 'yes':
                 continue #repeats the loop again
@@ -267,6 +269,8 @@ def main(filepath):
                 break #breaks the loop
         
         add_user = input("Would you like to add another user? Type \"yes\" or \"no\": ") #asks if they want to enter a user
+        while add_user != 'yes' and add_user != 'no':
+            add_user = input("Please enter 'yes' or 'no': ")
         if len(user_list) < 2 and add_user.lower() == "no": #checks if there are less than 2 users added and the response is "no"
             print("A minimum of two users is required") #message stating they need at least 2 users to recommend movies with
             continue #goes to the outer loop where they will be prompt to add a user again

@@ -71,7 +71,7 @@ def test_Movie():
     assert movie_obj.title == "Richard Pryor: Live in Concert"
     assert movie_obj.media_type == "MOVIE"
     assert movie_obj.movie_desc == "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
-    assert movie_obj.genre == "['comedy','documentation']"
+    assert movie_obj.genre == ['comedy','documentation']
     assert movie_obj.age_rating == "R"
     assert movie_obj.imdb_score == 8.1
 
