@@ -71,7 +71,7 @@ def test_Movie():
     assert movie_obj.title == "Richard Pryor: Live in Concert"
     assert movie_obj.media_type == "MOVIE"
     assert movie_obj.movie_desc == "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
-    assert movie_obj.genre == ['comedy','documentation']
+    assert movie_obj.genre == "['comedy','documentation']"
     assert movie_obj.age_rating == "R"
     assert movie_obj.imdb_score == 8.1
 
@@ -82,7 +82,7 @@ def test_str():
     title = "Richard Pryor: Live in Concert"
     media_type = "MOVIE"
     movie_desc = "Richard Pryor delivers monologues on race, sex, family and his favorite target—himself, live at the Terrace Theatre in Long Beach, California."
-    genre = ['comedy', 'documentation']
+    genre = "['comedy', 'documentation']"
     age_rating = "R"
     imdb_score = 8.1
     
@@ -113,22 +113,3 @@ def test_User():
     str_name = str(user_obj.name)
     #checks to see if the value in the attribute matches
     assert str_name == 'Megan'
-    
-    
-"""
-How to test the add_preference() function within the User class:
-
-Step 1: Import a .csv file into the Database object, which will contain the necessary list of medias to to populate our dataframe 
-Step 2: Get a movie name from the user
-Step 3: Pass in the movie name and the Database object as arguments into the add_prefenrence() method
-Step 4: add_prefrence() will check if the provided movie is in the list of prefernces (find a match)
-- If the movie is not present:
-    Step 5: Check if the movie name exists within the Database
-    - If there is a match:
-        Step 6: add_preference() will create a Movie object based on that movie's attributes.
-        Step 7: add_preference() will append that Movie object to the preference attribute of the User representation.
-    - If there is no match:
-        Step 6: the method raises a ValueError
-
-To determine if the test was successful, the tester can check if either a Movie object was appended to User.preferences or a ValueError was raised.
-"""

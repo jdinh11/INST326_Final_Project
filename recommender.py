@@ -132,9 +132,7 @@ class User():
         if movie.lower() not in [m.title.lower() for m in self.preferences]:
             match = database.movies.loc[database.movies['title'].str.contains(movie, case = False)]
             if not match.empty:
-  
                 media = Movie(match['id'].iloc[0], match['title'].iloc[0], match['type'].iloc[0], match['description'].iloc[0], match['genres'].iloc[0], match['age_certification'].iloc[0], match['imdb_score'].iloc[0])
-                print(media.movie_id,'\n', media.title, media.movie_desc, media.age_rating, media.genre, media.imdb_score)
                 self.preferences.append(media)
             
             else:
