@@ -15,6 +15,7 @@ How to test the add_preference() function within the User class:
     To determine if the test was successful, the tester can check if either a Movie object was appended to User.preferences or a ValueError was raised.
 
 How to test the get_recommendation functions:
+
     Step 1: Pass in the Netflix dataframe as an argument for the method
     Step 2: The method will create a new dataframe containing only medias that has genre(s) that is within the common_genres list 
     Step 3: The new dataframe will create a new column called num_matches that has the number of times a matched genre is found for each media
