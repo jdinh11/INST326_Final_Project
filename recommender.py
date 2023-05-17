@@ -88,7 +88,7 @@ class Movie():
         movie_desc (str): the description of the media.
         genre (list): the media's list of associated gernes.
         age_ratings (str): the media's age restrictions (if any).
-        imdb_score (int): the media's imdb ratings.
+        imdb_score (float): the media's imdb ratings.
     """
     def __init__(self, movie_id, title, media_type, movie_desc, genre, age_rating, imdb_score):
         """Initializes a Movie class.

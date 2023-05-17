@@ -53,6 +53,23 @@ def test_clean_data():
     #checks that movie names that are not ASCII chracters are removed 
     assert not movie_df_cleaned['title'].str.contains(r'[^\x00-\x7F]+').any()
     
+
+def test_find_movie():
+    '''Check if find_movie() functions as expected'''
+    database = Database('titles.csv')
+
+    result = database.find_movie('Arcane')
+    assert result.movie_id == 'ts222333'
+    assert result.title == 'Arcane'
+    assert result.media_type == 'SHOW'
+    assert result.movie_desc == 'Amid the stark discord of twin cities Piltover and Zaun, two sisters fight on rival sides of a war between magic technologies and clashing convictions.'
+    assert result.age_rating == 'TV-14'
+    assert result.genre == ['scifi', 'action', 'drama', 'animation', 'fantasy']
+    assert result.imdb_score == 9.0
+
+    result = database.find_movie('sdfoinef')
+    assert result is None
+
 def test_Movie():
     '''Tests the __init__ of the Movie class and if it intializes it.
     '''
