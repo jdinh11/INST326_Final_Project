@@ -3,7 +3,7 @@ import pandas as pd
 from recommender import Database, Movie, User
 
 def test_Database():
-    '''tests the __init__ of the Database class and if it intializes it 
+    '''Tests the __init__ of the Database class and check if it intializes it.
     '''
     filepath = Database("titles.csv")
     #checks if the movies attribute of the filepath is initialized correctly as a Pandas Dataframe
@@ -12,7 +12,7 @@ def test_Database():
     assert len(filepath.movies)
 
 def test_load_movie_data():
-    '''tests to see if it creates a pandas dataframe using the csv file with the correct columns
+    '''Tests to see if it creates a pandas dataframe using the csv file with the correct columns.
     '''
     filepath = "titles.csv"
     movie_df = Database(filepath)
@@ -28,7 +28,7 @@ def test_load_movie_data():
     assert 'imdb_score' in movie_df.movies
 
 def test_clean_data():
-    '''tests to see if the method cleans the dataframe correctly 
+    '''Tests to see if the method cleans the dataframe correctly.
     '''
     movie_df = pd.DataFrame({
         'id': [1, 2, 3, 4, 5],
@@ -54,7 +54,7 @@ def test_clean_data():
     assert not movie_df_cleaned['title'].str.contains(r'[^\x00-\x7F]+').any()
     
 def test_Movie():
-    '''tests the __init__ of the Movie class and if it intializes it
+    '''Tests the __init__ of the Movie class and if it intializes it.
     '''
     movie_id = "tm69997"
     title = "Richard Pryor: Live in Concert"
@@ -76,7 +76,7 @@ def test_Movie():
     assert movie_obj.imdb_score == 8.1
 
 def test_str():
-    '''tests if it returns a string representation of the Movie object
+    '''Tests if the string representation of the Movie object return correctly.
     '''
     movie_id = "tm69997"
     title = "Richard Pryor: Live in Concert"
@@ -106,6 +106,8 @@ def test_str():
     assert str_imdb_score == "8.1"
     
 def test_User():
+    '''Tests if the User object initializes correctly.
+    '''
     name = 'Megan'    
     #creates User object
     user_obj = User(name)

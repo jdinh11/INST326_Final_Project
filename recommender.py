@@ -27,7 +27,7 @@ class Database():
             filepath (str): the filepath to the dataset.
 
         Return:
-            the movies data as a Pandas DataFrame.
+            DataFrame: the movies data as a Pandas DataFrame.
         """
         #identify the columns to include in the dataframe
         cols = ["id", "title", "type", "description", "age_certification", "genres", "imdb_score"]
@@ -43,7 +43,7 @@ class Database():
             datas (tuple): rows of data for processing.
 
         Return:
-            the polished rows of data.
+            DataFrame: the polished rows of data.
         """
         df_copy = df.copy()
         #fill in NaN values within imdb_score column with 0
@@ -63,6 +63,14 @@ class Database():
         return df_copy
     
     def find_movie(self, movie):
+        """Search for a specific movie within the database.
+
+        Args:
+            movie (str): the title of the movie.
+
+        Return:
+            a string if a movie was found, or None if the movie name is not in the database.
+        """
         match = self.movies.loc[self.movies['title'].str.contains(movie, case = False)]
         if not match.empty:
             media = Movie(match['id'].iloc[0], match['title'].iloc[0], match['type'].iloc[0], match['description'].iloc[0], match['genres'].iloc[0], match['age_certification'].iloc[0], match['imdb_score'].iloc[0]) 
@@ -77,6 +85,7 @@ class Movie():
         movie_id (str): the media's id.
         title (str): the media's title.
         media_type (str): the type of media (movie or show).
+        movie_desc (str): the description of the media.
         genre (list): the media's list of associated gernes.
         age_ratings (str): the media's age restrictions (if any).
         imdb_score (int): the media's imdb ratings.
@@ -88,6 +97,7 @@ class Movie():
             movie_id (str): see class documentation.
             title (str): see class documentation.
             media_type (str): see class documentation.
+            movie_desc (str): see class documentation.
             genre (list): see class documentation.
             age_rating (str): see class documentation.
             imdb_score (float): see class documentation.
@@ -120,15 +130,24 @@ class User():
         preferences (list): a list of Movie objects pertaining to a user's favorite shows/movies.
     """
     def __init__(self, name):
-        """Initializes a User object
+        """Initializes a User object.
 
         Args:
-            name (str): see class documentation
+            name (str): see class documentation.
         """
         self.name = name
         self.preferences = []
     
     def add_preference(self, movie, database):
+        """Adds a media to the user's list of media preferences.
+
+        Args:
+            movie (str): the title of the media.
+            database (Database): the Database representation of the dataset.
+
+        Raises:
+            ValueError: No media was found withint the database under the name provided.
+        """
         if movie.lower() not in [m.title.lower() for m in self.preferences]:
             match = database.movies.loc[database.movies['title'].str.contains(movie, case = False)]
             if not match.empty:
@@ -143,13 +162,14 @@ class Recommender():
     
     Attributes:
         common_genres (dict): A dictionary containing the common favorite genres between the user and one of their friends
-    """
+        user (User): the User object containing info about the user and their preferences.
+        friend (User): the User object containing info about the user's chosen friend and their preferences.    """
     def __init__(self, user, friend):
         """Initializes a Recommender class. Sort the dictionary of common genre between two people.
         
         Args: 
-            user (User): the User object containing info about the user and their preferences.
-            friend (User): the User object containing info about the user's chosen friend and their preferences.
+            user (User): see class documentation.
+            friend (User): see class documentation.
         """
         self.common_genres = {}
         self.user = user
@@ -163,17 +183,14 @@ class Recommender():
     def get_common_genres(self):
         """Searches and ranks the shared genre between two users based on number of match occurances.
 
-        Args: 
-            user (User): the User object containing info about the user and their preferences.
-            friend (User): the User object containing info about the user's chosen friend and their preferences.
-
         Return:
-            dict: a dictionary where the key is the shared genre between two users and the amount of matches found for each shared genres.
+            dict: a dictionary where the key represents the shared genre between two users and the value represents the amount of matches found for each shared genres.
+
+        Side effects:
+            Modifies the value of self.preferences
         """
         user_genres = {}
         friend_genres = {}
-
-        print(self.user.preferences, self.friend.preferences)
 
         for u in self.user.preferences:
             for genre in u.genre:
@@ -191,7 +208,7 @@ class Recommender():
         
         shared_genres = user_genres.keys() & friend_genres.keys()
         common_genres = {genre: user_genres[genre] + friend_genres[genre] for genre in shared_genres}
-        print(shared_genres, common_genres)
+
         return common_genres
 
     def get_recommendation(self, database):
@@ -226,10 +243,10 @@ class Recommender():
         """Sort the recommendations narrowed down by genre by IMDb scores (descending order).
         
         Args:
-            df (dataframe): a dataframe containing a sorted list of recommendations based on shared genres
+            df (DataFrame): a dataframe containing a sorted list of recommendations based on shared genres
             
         Return:
-            score_df (dataframe): recommendations sorted by IMDb scores. 
+            score_df (DataFrame): recommendations sorted by IMDb scores. 
         """
         score_df = df.sort_values(by = 'imdb_score', ascending = False)
         return score_df
@@ -239,6 +256,9 @@ def main(filepath):
 
     Args: 
         filepath (str): the path to the csv file.
+
+    Side effects:
+        print data to the console, including questions to the user, a table of recommended movies, and information regarding a movie
     """
     database = Database(filepath) #creates database object using the filepath
     user_list = [] #empty list to store the user objects entered
